@@ -6,37 +6,61 @@ import {
   Param,
   Delete,
   Put,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { PaginationQueryDto } from '../common/pagination/pagination-query.dto';
+import { ApiPaginatedResponse } from '../common/pagination/paginated.decorator';
+import { Book } from './entities/book.entity';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { PaginatedDto } from '../common/pagination/paginated.dto';
 
 @Controller('books')
+@ApiTags('Books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Post()
-  create(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto);
+  @ApiCreatedResponse({ type: Book })
+  async create(@Body() createBookDto: CreateBookDto): Promise<Book> {
+    return await this.booksService.create(createBookDto);
   }
 
   @Get()
-  findAll() {
-    return this.booksService.findAll();
+  @ApiPaginatedResponse(Book)
+  async findAll(
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<PaginatedDto<Book>> {
+    return await this.booksService.findAll(paginationQueryDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.booksService.findOne(+id);
+  @ApiOkResponse({ type: Book })
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Book> {
+    const book = await this.booksService.findOne(id);
+    return book;
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(+id, updateBookDto);
+  @ApiOkResponse({ type: String })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBookDto: UpdateBookDto,
+  ): Promise<string> {
+    return this.booksService.update(id, updateBookDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.booksService.remove(+id);
+  @ApiOkResponse({ type: String })
+  remove(@Param('id', ParseIntPipe) id: number): Promise<string> {
+    return this.booksService.remove(id);
   }
 }

@@ -5,13 +5,13 @@ export class PaginatedDto<TData> {
   total: number;
 
   @ApiProperty()
-  perPage: number;
+  pageSize: number;
 
   @ApiProperty()
-  CurrentPage: number;
+  currentPage: number;
 
   @ApiProperty()
-  TotalPages: number;
+  totalPages: number;
 
-  results: TData[];
+  data: TData[];
 }

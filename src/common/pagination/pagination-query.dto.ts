@@ -1,29 +1,34 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
-enum SortDirection {
+export enum SortDirection {
   ASC = 'ASC',
   DESC = 'DESC',
 }
 
 export class PaginationQueryDto {
-  @ApiProperty({ default: 1 })
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
   @IsInt()
+  @Type(() => Number)
   @Min(1)
-  page: number;
+  page?: number = 1;
 
-  @ApiProperty({ default: 10 })
+  @ApiPropertyOptional({ default: 10 })
+  @IsOptional()
   @IsInt()
+  @Type(() => Number)
   @Min(1)
-  pageSize: number;
+  pageSize?: number = 10;
 
   @ApiPropertyOptional({ default: 'id' })
   @IsOptional()
   @IsString()
-  sortBy?: string;
+  sortBy?: string = 'id';
 
   @ApiPropertyOptional({ enum: SortDirection, default: SortDirection.ASC })
   @IsOptional()
   @IsEnum(SortDirection)
-  sortDirection?: SortDirection;
+  sortDirection?: SortDirection.ASC;
 }
