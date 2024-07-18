@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { Role } from '../constants';
+import { Role } from './constants';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -60,16 +60,22 @@ describe('UsersService', () => {
       const user = { id: 1, username: 'testuser', password: 'testpass' };
       mockUserRepository.findOne.mockResolvedValue(user);
 
-      const result = await service.findOne(1);
+      const result = await service.findOne({ id: 1, username: 'testuser' });
       expect(result).toEqual(user);
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: [{ id: 1 }, { username: 'testuser' }],
+      });
     });
 
-    it('should throw NotFoundException if user not found', async () => {
+    it('should throw Error if user not found', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      await expect(service.findOne({ id: 1 })).rejects.toThrow(
+        Error('User not found'),
+      );
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: [{ id: 1 }, { username: undefined }],
+      });
     });
   });
 });

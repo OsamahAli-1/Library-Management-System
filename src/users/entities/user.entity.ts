@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../../constants';
+import { Role } from '../constants';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

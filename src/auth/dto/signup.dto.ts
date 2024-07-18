@@ -1,8 +1,7 @@
-import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../constants';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
-export class CreateUserDto {
+export class SignupDto {
   @ApiProperty()
   @IsString()
   username: string;
@@ -13,9 +12,10 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
+  @MinLength(8)
   password: string;
 
   @ApiProperty()
-  @IsEnum(Role)
-  role: Role;
+  @IsString()
+  confirmPassword: string;
 }
