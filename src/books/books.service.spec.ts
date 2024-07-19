@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
-import { Repository } from 'typeorm';
 import { CreateBookDto } from './dto/create-book.dto';
 import { PaginatedDto } from '../common/pagination/paginated.dto';
 import {
@@ -14,7 +13,6 @@ import { UpdateBookDto } from './dto/update-book.dto';
 
 describe('BooksService', () => {
   let service: BooksService;
-  let repository: Repository<Book>;
 
   const mockBookRepository = {
     create: jest.fn(),
@@ -34,7 +32,6 @@ describe('BooksService', () => {
     }).compile();
 
     service = module.get<BooksService>(BooksService);
-    repository = module.get<Repository<Book>>(getRepositoryToken(Book));
   });
 
   it('should be defined', () => {
