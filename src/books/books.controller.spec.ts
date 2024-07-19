@@ -10,10 +10,11 @@ import { PaginatedDto } from '../common/pagination/paginated.dto';
 import { CreateBookDto } from './dto/create-book.dto';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 describe('BooksController', () => {
   let controller: BooksController;
-  let booksService: BooksService;
 
   const mockBooksService = {
     create: jest.fn(),
@@ -23,6 +24,14 @@ describe('BooksController', () => {
     remove: jest.fn(),
   };
 
+  const mockAuthGuard = {
+    canActivate: jest.fn(() => true),
+  };
+
+  const mockRolesGuard = {
+    canActivate: jest.fn(() => true),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BooksController],
@@ -30,10 +39,13 @@ describe('BooksController', () => {
     })
       .overrideProvider(BooksService)
       .useValue(mockBooksService)
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
       .compile();
 
     controller = module.get<BooksController>(BooksController);
-    booksService = module.get<BooksService>(BooksService);
   });
 
   it('should be defined', () => {

@@ -3,7 +3,6 @@ import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { Role } from './constants';
 
 describe('UsersService', () => {

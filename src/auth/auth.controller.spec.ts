@@ -8,7 +8,6 @@ import { LoginDto } from './dto/login.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let authService: AuthService;
 
   const mockAuthService = {
     signup: jest.fn(),
@@ -25,7 +24,6 @@ describe('AuthController', () => {
       .compile();
 
     controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
   });
 
   it('should be defined', () => {

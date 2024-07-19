@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Query } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
