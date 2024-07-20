@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../constants';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Borrow } from '../../borrow/entities/borrow.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -27,4 +29,12 @@ export class User {
   @ApiProperty()
   @Column({ name: 'created_at', default: new Date() })
   createdAt: Date;
+
+  @ApiProperty()
+  @OneToMany(() => Borrow, (borrow) => borrow.user, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  borrows: Borrow[];
 }

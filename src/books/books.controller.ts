@@ -20,6 +20,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { PaginatedDto } from '../common/pagination/paginated.dto';
@@ -37,6 +38,7 @@ export class BooksController {
 
   @Post()
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Create a book (Admin)' })
   @ApiCreatedResponse({ type: Book })
   async create(@Body() createBookDto: CreateBookDto): Promise<Book> {
     return await this.booksService.create(createBookDto);
@@ -44,6 +46,7 @@ export class BooksController {
 
   @Get()
   @Roles(Role.USER, Role.ADMIN)
+  @ApiOperation({ summary: 'get all books (Admin, User)' })
   @ApiPaginatedResponse(Book)
   async findAll(
     @Query() paginationQueryDto: PaginationQueryDto,
@@ -53,6 +56,7 @@ export class BooksController {
 
   @Get(':id')
   @Roles(Role.USER, Role.ADMIN)
+  @ApiOperation({ summary: 'get a book (Admin, User)' })
   @ApiOkResponse({ type: Book })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Book> {
     const book = await this.booksService.findOne(id);
@@ -61,18 +65,20 @@ export class BooksController {
 
   @Put(':id')
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Update a book (Admin)' })
   @ApiOkResponse({ type: String })
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<string> {
-    return this.booksService.update(id, updateBookDto);
+    return await this.booksService.update(id, updateBookDto);
   }
 
   @Delete(':id')
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Delete a book (Admin)' })
   @ApiOkResponse({ type: String })
-  remove(@Param('id', ParseIntPipe) id: number): Promise<string> {
-    return this.booksService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<string> {
+    return await this.booksService.remove(id);
   }
 }

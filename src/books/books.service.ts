@@ -1,11 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
-import { PaginationQueryDto } from '../common/pagination/pagination-query.dto';
+import {
+  PaginationQueryDto,
+  SortDirection,
+} from '../common/pagination/pagination-query.dto';
 import { PaginatedDto } from '../common/pagination/paginated.dto';
+import { BorrowStatus } from '../borrow/constants';
 
 @Injectable()
 export class BooksService {
@@ -20,7 +28,12 @@ export class BooksService {
   async findAll(
     paginationQueryDto: PaginationQueryDto,
   ): Promise<PaginatedDto<Book>> {
-    const { page, pageSize, sortBy, sortDirection } = paginationQueryDto;
+    const {
+      page = 1,
+      pageSize = 10,
+      sortBy = 'id',
+      sortDirection = SortDirection.ASC,
+    } = paginationQueryDto;
     const [data, totalCount] = await this.bookRepository.findAndCount({
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -54,6 +67,18 @@ export class BooksService {
   }
 
   async remove(id: number): Promise<string> {
+    const preventDeleteStatuses = [BorrowStatus.PENDING, BorrowStatus.APPROVED];
+    const bookToDelete = await this.findOne(id);
+
+    const hasPreventDeleteRequests = bookToDelete.borrows.some(
+      (borrowRequest) => preventDeleteStatuses.includes(borrowRequest.status),
+    );
+    if (hasPreventDeleteRequests) {
+      throw new ConflictException(
+        'Cannot delete book with pending or approved borrow requests',
+      );
+    }
+
     const book = await this.bookRepository.delete(id);
     if (book.affected === 0) {
       throw new NotFoundException(`Book with id = ${id} not found`);
