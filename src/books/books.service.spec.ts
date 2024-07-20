@@ -10,6 +10,8 @@ import {
 } from '../common/pagination/pagination-query.dto';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { BorrowStatus } from '../borrow/constants';
+import { User } from '../users/entities/user.entity';
 
 describe('BooksService', () => {
   let service: BooksService;
@@ -132,6 +134,9 @@ describe('BooksService', () => {
 
   describe('remove', () => {
     it('should delete a book if found', async () => {
+      const book = new Book();
+      book.borrows = [];
+      mockBookRepository.findOne.mockResolvedValue(book);
       mockBookRepository.delete.mockResolvedValue({ affected: 1 });
 
       expect(await service.remove(1)).toBe(
@@ -141,9 +146,43 @@ describe('BooksService', () => {
     });
 
     it('should throw NotFoundException if book not found', async () => {
+      const book = new Book();
+      book.borrows = [];
+      mockBookRepository.findOne.mockResolvedValue(book);
       mockBookRepository.delete.mockResolvedValue({ affected: 0 });
 
       await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ConflictException if book has pending or approved borrows', async () => {
+      const book = new Book();
+      const user = new User();
+      book.borrows = [
+        {
+          id: 1,
+          status: BorrowStatus.PENDING,
+          userId: 1,
+          bookId: 1,
+          borrowDate: new Date(),
+          returnDate: new Date(),
+          book,
+          user,
+        },
+        {
+          id: 2,
+          status: BorrowStatus.APPROVED,
+          userId: 1,
+          bookId: 1,
+          borrowDate: new Date(),
+          returnDate: new Date(),
+          book,
+          user,
+        },
+      ];
+
+      mockBookRepository.findOne.mockResolvedValue(book);
+
+      await expect(service.remove(1)).rejects.toThrow();
     });
   });
 });

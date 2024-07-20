@@ -26,7 +26,7 @@ export class SetupAdminService implements OnModuleInit {
     try {
       await this.usersService.create(createUserDto);
     } catch (error) {
-      Logger.error('Admin user already exists');
+      Logger.log('Admin user already exists', 'SetupAdminService');
     }
   }
 }

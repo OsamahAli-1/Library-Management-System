@@ -13,19 +13,19 @@ export class PaginationQueryDto {
   @IsInt()
   @Type(() => Number)
   @Min(1)
-  page?: number = 1;
+  page?: number;
 
   @ApiPropertyOptional({ default: 10 })
   @IsOptional()
   @IsInt()
   @Type(() => Number)
   @Min(1)
-  pageSize?: number = 10;
+  pageSize?: number;
 
   @ApiPropertyOptional({ default: 'id' })
   @IsOptional()
   @IsString()
-  sortBy?: string = 'id';
+  sortBy?: string;
 
   @ApiPropertyOptional({ enum: SortDirection, default: SortDirection.ASC })
   @IsOptional()

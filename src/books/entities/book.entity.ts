@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Borrow } from '../../borrow/entities/borrow.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Book {
@@ -34,4 +35,12 @@ export class Book {
   @ApiProperty({ default: 1 })
   @Column({ name: 'available_copies', default: 1 })
   availableCopies: number;
+
+  @ApiProperty()
+  @OneToMany(() => Borrow, (borrow) => borrow.book, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  borrows: Borrow[];
 }
